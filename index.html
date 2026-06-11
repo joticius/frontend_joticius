@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CargamEsta - Gestión de Transporte de Carga</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-content">
+            <div class="login-left">
+                <div class="logo-container">
+                    <svg class="logo-truck" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Camión (rojo) -->
+                        <g id="truck">
+                            <!-- Cabina -->
+                            <rect x="30" y="50" width="50" height="35" fill="none" stroke="white" stroke-width="3"/>
+                            <!-- Ventana cabina -->
+                            <rect x="38" y="55" width="20" height="15" fill="none" stroke="white" stroke-width="2"/>
+                            <!-- Ruedas delanteras -->
+                            <circle cx="45" cy="95" r="8" fill="none" stroke="white" stroke-width="2"/>
+                            <circle cx="65" cy="95" r="8" fill="none" stroke="white" stroke-width="2"/>
+                            
+                            <!-- Carrocería -->
+                            <rect x="80" y="50" width="85" height="40" fill="none" stroke="white" stroke-width="3"/>
+                            <!-- Ruedas traseras (dobles) -->
+                            <circle cx="130" cy="95" r="8" fill="none" stroke="white" stroke-width="2"/>
+                            <circle cx="142" cy="95" r="8" fill="none" stroke="white" stroke-width="2"/>
+                            <circle cx="160" cy="95" r="8" fill="none" stroke="white" stroke-width="2"/>
+                            <circle cx="172" cy="95" r="8" fill="none" stroke="white" stroke-width="2"/>
+                        </g>
+                    </svg>
+                </div>
+                <h1 class="logo-text">
+                    <span class="logo-text-cargam">CargamEsta</span>
+                </h1>
+                <p class="logo-subtitle">Gestiona y vigila tus cargas y viajes con nosotros</p>
+            </div>
+
+            <div class="login-right">
+                <h2 class="login-title">¡Bienvenido!</h2>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="loginUser">Usuario</label>
+                        <input type="text" id="loginUser" name="usuario" required placeholder="Tu usuario">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Contraseña</label>
+                        <input type="password" id="loginPassword" name="contrasena" required placeholder="Tu contraseña">
+                    </div>
+                    <div id="loginError" class="error-message"></div>
+                    <button type="submit" class="btn-login">Iniciar sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="dashboard-container" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <svg class="logo-mini" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="8" y="15" width="15" height="10" fill="none" stroke="white" stroke-width="1"/>
+                    <rect x="23" y="15" width="25" height="10" fill="none" stroke="white" stroke-width="1"/>
+                    <circle cx="13" cy="28" r="3" fill="none" stroke="white" stroke-width="1"/>
+                    <circle cx="38" cy="28" r="3" fill="none" stroke="white" stroke-width="1"/>
+                    <circle cx="45" cy="28" r="3" fill="none" stroke="white" stroke-width="1"/>
+                </svg>
+                <span>CargamEsta</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item" onclick="showSection('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    Dashboard
+                </button>
+                <div class="nav-module">
+                    <h3>Conductores</h3>
+                    <button class="nav-item sub" onclick="showSection('conductoresCrear')">Crear</button>
+                    <button class="nav-item sub" onclick="showSection('conductoresEditar')">Editar</button>
+                    <button class="nav-item sub" onclick="showSection('conductoresConsultar')">Consultar</button>
+                </div>
+                <div class="nav-module">
+                    <h3>Vehículos</h3>
+                    <button class="nav-item sub" onclick="showSection('vehiculosCrear')">Crear</button>
+                    <button class="nav-item sub" onclick="showSection('vehiculosEditar')">Editar</button>
+                    <button class="nav-item sub" onclick="showSection('vehiculosConsultar')">Consultar</button>
+                </div>
+                <div class="nav-module">
+                    <h3>Rutas</h3>
+                    <button class="nav-item sub" onclick="showSection('rutasCrear')">Crear</button>
+                    <button class="nav-item sub" onclick="showSection('rutasEditar')">Editar</button>
+                    <button class="nav-item sub" onclick="showSection('rutasConsultar')">Consultar</button>
+                </div>
+                <div class="nav-module">
+                    <h3>Viajes</h3>
+                    <button class="nav-item sub" onclick="showSection('viajesprogramar')">Programar</button>
+                    <button class="nav-item sub" onclick="showSection('viajesEditar')">Editar</button>
+                    <button class="nav-item sub" onclick="showSection('viajesconsultar')">Consultar</button>
+                </div>
+
+                <button class="nav-item logout" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    Cerrar sesión
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="content-section active">
+                <h1>¿Aquí qué?</h1>
+                <div class="dashboard-grid">
+                    <button class="dashboard-card" onclick="showSection('conductoresCrear')">
+                        <span class="card-emoji">👤</span>
+                        <span class="card-text">Conductores</span>
+                    </button>
+                    <button class="dashboard-card" onclick="showSection('vehiculosCrear')">
+                        <span class="card-emoji">🚚</span>
+                        <span class="card-text">Vehículos</span>
+                    </button>
+                    <button class="dashboard-card" onclick="showSection('rutasCrear')">
+                        <span class="card-emoji">🗺️</span>
+                        <span class="card-text">Rutas</span>
+                    </button>
+                    <button class="dashboard-card" onclick="showSection('viajesprogramar')">
+                        <span class="card-emoji">✈️</span>
+                        <span class="card-text">Viajes</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- CONDUCTORES -->
+            <section id="conductoresCrearSection" class="content-section">
+                <h1>Crear conductor</h1>
+                <form id="formCrearConductor" class="form-grid">
+                    <div class="form-group">
+                        <label>Nombres</label>
+                        <input type="text" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apellidos</label>
+                        <input type="text" name="apellidos" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Documento</label>
+                        <input type="text" name="documento" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" name="telefono" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" name="correo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de licencia</label>
+                        <input type="text" name="numero_licencia" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría de licencia</label>
+                        <select name="tipo_licencia" required>
+                            <option value="">Seleccionar</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de ven. de licencia</label>
+                        <input type="date" name="fecha_vencimiento_licencia" required>
+                    </div>
+                    <div class="form-message" id="mensajeConductor"></div>
+                    <button type="submit" class="btn-submit">Registrar</button>
+                </form>
+            </section>
+
+            <section id="conductoresEditarSection" class="content-section">
+                <h1>Editar conductor</h1>
+                <form id="formEditarConductor" class="form-grid">
+                    <div class="form-group">
+                        <label>Buscar conductor por ID</label>
+                        <input type="number" id="searchConductorId" placeholder="ID del conductor">
+                        <button type="button" onclick="buscarConductorEdit()">Buscar</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombres</label>
+                        <input type="text" name="nombre">
+                    </div>
+                    <div class="form-group">
+                        <label>Apellidos</label>
+                        <input type="text" name="apellidos">
+                    </div>
+                    <div class="form-group">
+                        <label>Documento</label>
+                        <input type="text" name="documento">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" name="telefono">
+                    </div>
+                    <div class="form-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" name="correo">
+                    </div>
+                    <div class="form-group">
+                        <label>Número de licencia</label>
+                        <input type="text" name="numero_licencia">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría de licencia</label>
+                        <select name="tipo_licencia">
+                            <option value="">Seleccionar</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de ven. de licencia</label>
+                        <input type="date" name="fecha_vencimiento_licencia">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select name="estado">
+                            <option value="">Seleccionar</option>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                            <option value="suspendido">Suspendido</option>
+                        </select>
+                    </div>
+                    <div class="form-message" id="mensajeEditarConductor"></div>
+                    <button type="submit" class="btn-submit">Editar</button>
+                </form>
+            </section>
+
+            <section id="conductoresConsultarSection" class="content-section">
+                <h1>Consultar conductor</h1>
+                <div class="search-section">
+                    <p>Registre información en alguno de los recuadros. Rellene con la información solicitada.</p>
+                    <div class="form-group">
+                        <label>Documento</label>
+                        <input type="text" id="searchDocumento" placeholder="Documento">
+                    </div>
+                    <div class="form-group">
+                        <label>Número de licencia</label>
+                        <input type="text" id="searchLicencia" placeholder="Número de licencia">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="searchEstado">
+                            <option value="">Todos</option>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                            <option value="suspendido">Suspendido</option>
+                        </select>
+                    </div>
+                    <button onclick="consultarConductores()" class="btn-submit">Consultar</button>
+                </div>
+                <div id="listadoConductores" class="listado-container"></div>
+            </section>
+
+            <!-- VEHÍCULOS -->
+            <section id="vehiculosCrearSection" class="content-section">
+                <h1>Crear vehículo</h1>
+                <form id="formCrearVehiculo" class="form-grid">
+                    <div class="form-group">
+                        <label>Placa</label>
+                        <input type="text" name="placa" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de vehículo</label>
+                        <input type="text" name="tipo_vehiculo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Capacidad de carga</label>
+                        <input type="number" name="capacidad_carga" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo</label>
+                        <input type="text" name="modelo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" name="marca" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select name="estado" required>
+                            <option value="">Seleccionar</option>
+                            <option value="disponible">Disponible</option>
+                            <option value="en_ruta">En ruta</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="form-message" id="mensajeVehiculo"></div>
+                    <button type="submit" class="btn-submit">Registrar</button>
+                </form>
+            </section>
+
+            <section id="vehiculosEditarSection" class="content-section">
+                <h1>Editar vehículo</h1>
+                <form id="formEditarVehiculo" class="form-grid">
+                    <div class="form-group">
+                        <label>Buscar vehículo por ID</label>
+                        <input type="number" id="searchVehiculoId" placeholder="ID del vehículo">
+                        <button type="button" onclick="buscarVehiculoEdit()">Buscar</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Placa</label>
+                        <input type="text" name="placa">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de vehículo</label>
+                        <input type="text" name="tipo_vehiculo">
+                    </div>
+                    <div class="form-group">
+                        <label>Capacidad de carga</label>
+                        <input type="number" name="capacidad_carga">
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo</label>
+                        <input type="text" name="modelo">
+                    </div>
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" name="marca">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select name="estado">
+                            <option value="">Seleccionar</option>
+                            <option value="disponible">Disponible</option>
+                            <option value="en_ruta">En ruta</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="form-message" id="mensajeEditarVehiculo"></div>
+                    <button type="submit" class="btn-submit">Editar</button>
+                </form>
+            </section>
+
+            <section id="vehiculosConsultarSection" class="content-section">
+                <h1>Consultar vehículo</h1>
+                <div class="search-section">
+                    <p>Registre información en alguno de los recuadros. Rellene con la información solicitada.</p>
+                    <div class="form-group">
+                        <label>Placa</label>
+                        <input type="text" id="searchPlaca" placeholder="Placa">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de vehículo</label>
+                        <input type="text" id="searchTipoVehiculo" placeholder="Tipo de vehículo">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="searchEstadoVehiculo">
+                            <option value="">Todos</option>
+                            <option value="disponible">Disponible</option>
+                            <option value="en_ruta">En ruta</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                    <button onclick="consultarVehiculos()" class="btn-submit">Consultar</button>
+                </div>
+                <div id="listadoVehiculos" class="listado-container"></div>
+            </section>
+
+            <!-- RUTAS -->
+            <section id="rutasCrearSection" class="content-section">
+                <h1>Crear ruta</h1>
+                <form id="formCrearRuta" class="form-grid">
+                    <div class="form-group">
+                        <label>Origen</label>
+                        <input type="text" name="origen" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Destino</label>
+                        <input type="text" name="destino" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Distancia</label>
+                        <input type="number" name="distancia" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tiempo estimado</label>
+                        <input type="text" name="tiempo_estimado" placeholder="ej: 2 horas" required>
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Observaciones</label>
+                        <textarea name="observaciones"></textarea>
+                    </div>
+                    <div class="form-message" id="mensajeRuta"></div>
+                    <button type="submit" class="btn-submit">Registrar</button>
+                </form>
+            </section>
+
+            <section id="rutasEditarSection" class="content-section">
+                <h1>Editar ruta</h1>
+                <form id="formEditarRuta" class="form-grid">
+                    <div class="form-group">
+                        <label>Buscar ruta por ID</label>
+                        <input type="number" id="searchRutaId" placeholder="ID de la ruta">
+                        <button type="button" onclick="buscarRutaEdit()">Buscar</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Origen</label>
+                        <input type="text" name="origen">
+                    </div>
+                    <div class="form-group">
+                        <label>Destino</label>
+                        <input type="text" name="destino">
+                    </div>
+                    <div class="form-group">
+                        <label>Distancia</label>
+                        <input type="number" name="distancia">
+                    </div>
+                    <div class="form-group">
+                        <label>Tiempo estimado</label>
+                        <input type="text" name="tiempo_estimado">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Observaciones</label>
+                        <textarea name="observaciones"></textarea>
+                    </div>
+                    <div class="form-message" id="mensajeEditarRuta"></div>
+                    <button type="submit" class="btn-submit">Editar</button>
+                </form>
+            </section>
+
+            <section id="rutasConsultarSection" class="content-section">
+                <h1>Consultar ruta</h1>
+                <div class="search-section">
+                    <p>Registre información en alguno de los recuadros. Rellene con la información solicitada.</p>
+                    <div class="form-group">
+                        <label>Ciudad</label>
+                        <input type="text" id="searchCiudad" placeholder="Ciudad de origen o destino">
+                    </div>
+                    <button onclick="consultarRutas()" class="btn-submit">Consultar</button>
+                </div>
+                <div id="listadoRutas" class="listado-container"></div>
+            </section>
+
+            <!-- VIAJES -->
+            <section id="viajesProgramarSection" class="content-section">
+                <h1>Programar viaje</h1>
+                <form id="formProgramarViaje" class="form-grid">
+                    <div class="form-group">
+                        <label>Conductor</label>
+                        <select name="conductor_id" required onclick="cargarConductores(this)"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehículo</label>
+                        <select name="vehiculo_id" required onclick="cargarVehiculos(this)"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ruta</label>
+                        <select name="ruta_id" required onclick="cargarRutas(this)"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de salida</label>
+                        <input type="date" name="fecha_salida" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora de salida</label>
+                        <input type="time" name="hora_salida" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha estimada de llegada</label>
+                        <input type="date" name="fecha_estimada_llegada" required>
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Observaciones</label>
+                        <textarea name="observaciones"></textarea>
+                    </div>
+                    <div class="form-message" id="mensajeViaje"></div>
+                    <button type="submit" class="btn-submit">Registrar</button>
+                </form>
+            </section>
+
+            <section id="viajesEditarSection" class="content-section">
+                <h1>Modificar viaje</h1>
+                <form id="formEditarViaje" class="form-grid">
+                    <div class="form-group">
+                        <label>Buscar viaje por ID</label>
+                        <input type="number" id="searchViajeId" placeholder="ID del viaje">
+                        <button type="button" onclick="buscarViajeEdit()">Buscar</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Conductor</label>
+                        <select name="conductor_id" onclick="cargarConductores(this)"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehículo</label>
+                        <select name="vehiculo_id" onclick="cargarVehiculos(this)"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha salida</label>
+                        <input type="date" name="fecha_salida">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha estimada de llegada</label>
+                        <input type="date" name="fecha_estimada_llegada">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Observaciones</label>
+                        <textarea name="observaciones"></textarea>
+                    </div>
+                    <div class="form-message" id="mensajeEditarViaje"></div>
+                    <button type="submit" class="btn-submit">Modificar</button>
+                </form>
+            </section>
+
+            <section id="viajesConsultarSection" class="content-section">
+                <h1>Consultar viaje</h1>
+                <div class="search-section">
+                    <p>Registre información en alguno de los recuadros. Rellene con la información solicitada.</p>
+                    <div class="form-group">
+                        <label>Conductor</label>
+                        <select id="searchConductorViaje" onclick="cargarConductoresSearch(this)"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehículo</label>
+                        <select id="searchVehiculoViaje" onclick="cargarVehiculosSearch(this)"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="searchEstadoViaje">
+                            <option value="">Todos</option>
+                            <option value="programado">Programado</option>
+                            <option value="en_transito">En tránsito</option>
+                            <option value="retrasado">Retrasado</option>
+                            <option value="finalizado">Finalizado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha salida</label>
+                        <input type="date" id="searchFechaSalida">
+                    </div>
+                    <button onclick="consultarViajes()" class="btn-submit">Consultar</button>
+                </div>
+                <div id="listadoViajes" class="listado-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
