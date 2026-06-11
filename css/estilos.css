@@ -76,12 +76,12 @@ html, body {
     text-align: center;
 }
 
-.logo-text-cargam {
+.logo-text-logitrans {
     color: var(--color-blanco);
 }
 
-.logo-text-cargam::after {
-    content: "Esta";
+.logo-text-logitrans::after {
+    content: "Trans";
     color: var(--color-rojo);
 }
 

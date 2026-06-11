@@ -1,6 +1,6 @@
 # frontend_joticius
 
-# Frontend CargamEsta
+# Frontend LogiTrans
 
 Aplicación frontend para la gestión logística y control de transporte de carga. Desarrollada con HTML5, CSS3 y JavaScript Vanilla.
 
@@ -262,7 +262,7 @@ Para agregar nuevas funcionalidades:
 
 ## Licencia
 
-Proyecto privado de CargamEsta - Sistema de Transporte de Carga.
+Proyecto privado de LogiTrans - Sistema de Transporte de Carga.
 
 ---
 
