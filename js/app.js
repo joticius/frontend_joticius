@@ -176,6 +176,66 @@ async function consultarConductores() {
     }
 }
 
+// Buscar conductor para eliminar
+async function buscarConductorEliminar() {
+    const id = document.getElementById('searchConductorIdEliminar').value;
+    if (!id) {
+        alert('Ingresa el ID del conductor');
+        return;
+    }
+
+    try {
+        const response = await ConductoresAPI.getById(id);
+        if (response.success) {
+            const conductor = response.data;
+            const infoDiv = document.getElementById('conductorInfoEliminar');
+            infoDiv.innerHTML = `
+                <p><strong>Nombre:</strong> ${conductor.nombre} ${conductor.apellidos || ''}</p>
+                <p><strong>Documento:</strong> ${conductor.documento}</p>
+                <p><strong>Teléfono:</strong> ${conductor.telefono}</p>
+                <p><strong>Correo:</strong> ${conductor.correo}</p>
+                <p><strong>Licencia:</strong> ${conductor.numero_licencia} (${conductor.tipo_licencia})</p>
+                <p><strong>Estado:</strong> ${conductor.estado}</p>
+            `;
+            infoDiv.style.display = 'block';
+            
+            const btnEliminar = document.getElementById('btnEliminarConductor');
+            btnEliminar.style.display = 'inline-block';
+            btnEliminar.dataset.conductorId = id;
+        } else {
+            alert('Conductor no encontrado');
+            document.getElementById('conductorInfoEliminar').style.display = 'none';
+            document.getElementById('btnEliminarConductor').style.display = 'none';
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+// Eliminar conductor
+async function eliminarConductor() {
+    const id = document.getElementById('btnEliminarConductor').dataset.conductorId;
+    
+    if (!confirm('¿Estás seguro de que deseas eliminar este conductor? Esta acción no se puede deshacer.')) {
+        return;
+    }
+
+    try {
+        const response = await ConductoresAPI.delete(id);
+        if (response.success) {
+            alert('Conductor eliminado correctamente');
+            document.getElementById('searchConductorIdEliminar').value = '';
+            document.getElementById('conductorInfoEliminar').style.display = 'none';
+            document.getElementById('conductorInfoEliminar').innerHTML = '';
+            document.getElementById('btnEliminarConductor').style.display = 'none';
+        } else {
+            alert('Error al eliminar: ' + (response.message || 'Error desconocido'));
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
 // ============================================================
 // VEHÍCULOS
 // ============================================================
@@ -692,5 +752,90 @@ async function consultarViajes() {
         });
     } catch (error) {
         alert('Error: ' + error.message);
+    }
+}
+
+async function cargarConductores(select) {
+    console.log('Intentando cargar conductores...');
+    if (select.options.length > 1) {
+        console.log('Ya cargados');
+        return;
+    }
+
+    try {
+        const response = await ConductoresAPI.getActivos();
+        console.log('Respuesta conductores:', response);
+        
+        if (response.data && Array.isArray(response.data)) {
+            response.data.forEach(conductor => {
+                const option = document.createElement('option');
+                option.value = conductor.id;
+                option.textContent = conductor.nombre + ' ' + (conductor.apellidos || '');
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando conductores:', error);
+    }
+}
+
+async function cargarVehiculos(select) {
+    console.log('Intentando cargar vehículos...');
+    if (select.options.length > 1) {
+        console.log('Ya cargados');
+        return;
+    }
+
+    try {
+        const response = await VehiculosAPI.getAll({ estado: 'disponible' });
+        console.log('Respuesta vehículos:', response);
+        
+        if (response.data && Array.isArray(response.data)) {
+            response.data.forEach(vehiculo => {
+                const option = document.createElement('option');
+                option.value = vehiculo.id;
+                option.textContent = vehiculo.placa + ' - ' + vehiculo.marca;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando vehículos:', error);
+    }
+}
+
+async function cargarRutas(select) {
+    console.log('Intentando cargar rutas...');
+    if (select.options.length > 1) {
+        console.log('Ya cargadas');
+        return;
+    }
+
+    try {
+        const response = await RutasAPI.getAll();
+        console.log('Respuesta rutas:', response);
+        
+        if (response.data && Array.isArray(response.data)) {
+            response.data.forEach(ruta => {
+                const option = document.createElement('option');
+                option.value = ruta.id;
+                option.textContent = ruta.origen + ' → ' + ruta.destino;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando rutas:', error);
+    }
+}
+
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    const section = document.getElementById(sectionId + 'Section');
+    if (section) {
+        section.classList.add('active');
+    } else {
+        console.error('Sección no encontrada:', sectionId + 'Section');
     }
 }
