@@ -4,11 +4,11 @@
  */
 
 const API_CONFIG = {
-    MS_AUTH: 'http://localhost:8000',
-    MS_CONDUCTORES: 'http://localhost:8001',
-    MS_VEHICULOS: 'http://localhost:8002',
-    MS_RUTAS: 'http://localhost:8003',
-    MS_VIAJES: 'http://localhost:8004'
+    MS_AUTH: 'http://localhost:8001',        // ← CAMBIAR
+    MS_CONDUCTORES: 'http://localhost:8002',
+    MS_VEHICULOS: 'http://localhost:8003',
+    MS_RUTAS: 'http://localhost:8004',
+    MS_VIAJES: 'http://localhost:8005'
 };
 
 class ApiService {
