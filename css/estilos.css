@@ -453,3 +453,64 @@ table button:hover {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(204, 0, 0, 0.8);
 }
+
+/* ============================================================
+   LISTA DE CONSULTA
+   Agregar al final de estilos.css
+   ============================================================ */
+
+.lista-container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 8px 0;
+    margin-top: 16px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.lista-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.lista-item:last-child {
+    border-bottom: none;
+}
+
+.lista-texto {
+    color: #111;
+    font-size: 0.95rem;
+}
+
+/* Badge de estado */
+.estado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #d1d5db;
+    border-radius: 999px;
+    padding: 4px 12px 4px 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #111;
+    white-space: nowrap;
+}
+
+.estado-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Mensajes vacíos / cargando */
+.lista-vacia,
+.lista-cargando {
+    text-align: center;
+    padding: 32px;
+    color: #6b7280;
+    font-size: 0.9rem;
+}

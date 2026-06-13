@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CargamEsta - Gestión de Transporte</title>
+    <title>LogiTrans - Gestión de Transporte</title>
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
@@ -163,18 +163,21 @@
                 </form>
             </section>
 
-            <section id="conductoresConsultarSection" class="content-section">
-                <h2>Consultar conductores</h2>
-                <div class="filter-group">
-                    <input type="text" id="filtroDocumento" placeholder="Buscar por documento" onkeyup="filtrarConductores()">
-                    <input type="text" id="filtroLicencia" placeholder="Buscar por licencia" onkeyup="filtrarConductores()">
-                    <select id="filtroEstado" onchange="filtrarConductores()">
-                        <option value="">Todos los estados</option>
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
-                        <option value="suspendido">Suspendido</option>
-                    </select>
-                </div>
+           <!-- CONDUCTORES - CONSULTAR -->
+<section id="conductoresConsultarSection" class="content-section">
+    <h2>Consultar conductores</h2>
+    <div class="filter-group">
+        <input type="text" id="filtroDocumento" placeholder="Buscar por documento" oninput="filtrarConductores()">
+        <input type="text" id="filtroLicencia" placeholder="Buscar por licencia" oninput="filtrarConductores()">
+        <select id="filtroEstado" onchange="filtrarConductores()">
+            <option value="">Todos los estados</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="suspendido">Suspendido</option>
+        </select>
+    </div>
+    <div id="listaConductores" class="lista-container"></div>
+</section>
                 <div id="tablaConductores"></div>
             </section>
 
@@ -254,22 +257,22 @@
                     <button type="submit" class="btn-submit">Actualizar</button>
                 </form>
             </section>
-
-            <section id="vehiculosConsultarSection" class="content-section">
-                <h2>Consultar vehículos</h2>
-                <div class="filter-group">
-                    <input type="text" id="filtroPlaca" placeholder="Buscar por placa" onkeyup="filtrarVehiculos()">
-                    <input type="text" id="filtroTipo" placeholder="Buscar por tipo" onkeyup="filtrarVehiculos()">
-                    <select id="filtroEstadoVehiculo" onchange="filtrarVehiculos()">
-                        <option value="">Todos los estados</option>
-                        <option value="disponible">Disponible</option>
-                        <option value="en_ruta">En ruta</option>
-                        <option value="mantenimiento">Mantenimiento</option>
-                        <option value="inactivo">Inactivo</option>
-                    </select>
-                </div>
-                <div id="tablaVehiculos"></div>
-            </section>
+<!-- VEHÍCULOS - CONSULTAR -->
+<section id="vehiculosConsultarSection" class="content-section">
+    <h2>Consultar vehículos</h2>
+    <div class="filter-group">
+        <input type="text" id="filtroPlaca" placeholder="Buscar por placa" oninput="filtrarVehiculos()">
+        <input type="text" id="filtroTipo" placeholder="Buscar por tipo" oninput="filtrarVehiculos()">
+        <select id="filtroEstadoVehiculo" onchange="filtrarVehiculos()">
+            <option value="">Todos los estados</option>
+            <option value="disponible">Disponible</option>
+            <option value="en_ruta">En ruta</option>
+            <option value="mantenimiento">Mantenimiento</option>
+            <option value="inactivo">Inactivo</option>
+        </select>
+    </div>
+    <div id="listaVehiculos" class="lista-container"></div>
+</section>
 
             <!-- RUTAS -->
             <section id="rutasCrmarriarSection" class="content-section">
@@ -329,14 +332,15 @@
                 </form>
             </section>
 
-            <section id="rutasConsultarSection" class="content-section">
-                <h2>Consultar rutas</h2>
-                <div class="filter-group">
-                    <input type="text" id="filtroOrigen" placeholder="Buscar por origen" onkeyup="filtrarRutas()">
-                    <input type="text" id="filtroDestino" placeholder="Buscar por destino" onkeyup="filtrarRutas()">
-                </div>
-                <div id="tablaRutas"></div>
-            </section>
+            <!-- RUTAS - CONSULTAR -->
+                <section id="rutasConsultarSection" class="content-section">
+                    <h2>Consultar rutas</h2>
+                    <div class="filter-group">
+                        <input type="text" id="filtroOrigen" placeholder="Buscar por origen" oninput="filtrarRutas()">
+                        <input type="text" id="filtroDestino" placeholder="Buscar por destino" oninput="filtrarRutas()">
+                    </div>
+                    <div id="listaRutas" class="lista-container"></div>
+                </section>
 
             <!-- VIAJES -->
             <section id="viajesProgramarSection" class="content-section">
@@ -417,21 +421,22 @@
                 </form>
             </section>
 
-            <section id="viajesConsultarSection" class="content-section">
-                <h2>Consultar viajes</h2>
-                <div class="filter-group">
-                    <input type="text" id="filtroConductorViaje" placeholder="Buscar por conductor" onkeyup="filtrarViajes()">
-                    <select id="filtroEstadoViaje" onchange="filtrarViajes()">
-                        <option value="">Todos los estados</option>
-                        <option value="programado">Programado</option>
-                        <option value="en_transito">En tránsito</option>
-                        <option value="retrasado">Retrasado</option>
-                        <option value="finalizado">Finalizado</option>
-                        <option value="cancelado">Cancelado</option>
-                    </select>
-                </div>
-                <div id="tablaViajes"></div>
-            </section>
+            <!-- VIAJES - CONSULTAR -->
+<section id="viajesConsultarSection" class="content-section">
+    <h2>Consultar viajes</h2>
+    <div class="filter-group">
+        <input type="text" id="filtroConductorViaje" placeholder="Buscar por conductor ID" oninput="filtrarViajes()">
+        <select id="filtroEstadoViaje" onchange="filtrarViajes()">
+            <option value="">Todos los estados</option>
+            <option value="programado">Programado</option>
+            <option value="en_transito">En tránsito</option>
+            <option value="retrasado">Retrasado</option>
+            <option value="finalizado">Finalizado</option>
+            <option value="cancelado">Cancelado</option>
+        </select>
+    </div>
+    <div id="listaViajes" class="lista-container"></div>
+</section>
         </div>
     </div>
 
