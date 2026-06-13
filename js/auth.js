@@ -1,183 +1,293 @@
-/**
- * Auth Module
- * Maneja autenticación, tokens y sesión
- */
+// ============================================================
+// AUTENTICACIÓN SIMPLE Y DIRECTA
+// ============================================================
 
 class Auth {
-    /**
-     * Guardar token en localStorage
-     */
     static setToken(token) {
         localStorage.setItem('token', token);
     }
 
-    /**
-     * Obtener token del localStorage
-     */
     static getToken() {
         return localStorage.getItem('token');
     }
 
-    /**
-     * Verificar si hay sesión activa
-     */
-    static isAuthenticated() {
-        return this.getToken() !== null;
-    }
-
-    /**
-     * Guardar datos del usuario
-     */
-    static setUser(userData) {
-        localStorage.setItem('user', JSON.stringify(userData));
-    }
-
-    /**
-     * Obtener datos del usuario
-     */
-    static getUser() {
-        const user = localStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
-    }
-
-    /**
-     * Limpiar sesión
-     */
     static clearSession() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
     }
 
-    /**
-     * Login
-     */
     static async login(usuario, contrasena) {
-        try {
-            const response = await AuthAPI.login(usuario, contrasena);
+        console.log('Intentando login con:', usuario);
+        
+        const response = await fetch('http://localhost:8001/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ usuario, contrasena })
+        });
 
-            if (response.success) {
-                this.setToken(response.data.token);
-                this.setUser(response.data);
-                return { success: true, data: response.data };
-            } else {
-                return { success: false, message: response.message };
-            }
-        } catch (error) {
-            return { success: false, message: error.message };
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (!data.success) {
+            throw new Error(data.message || 'Error en la autenticación');
         }
-    }
 
-    /**
-     * Logout
-     */
-    static async logout() {
-        try {
-            await AuthAPI.logout();
-        } catch (error) {
-            console.error('Error en logout:', error);
-        } finally {
-            this.clearSession();
-        }
-    }
-
-    /**
-     * Verificar token actual
-     */
-    static async verifyToken() {
-        try {
-            if (!this.isAuthenticated()) {
-                return false;
-            }
-
-            const response = await AuthAPI.verifyToken();
-            return response.success;
-        } catch (error) {
-            this.clearSession();
-            return false;
-        }
+        this.setToken(data.data.token);
+        return data.data;
     }
 }
 
-/**
- * Redirigir a login si no está autenticado
- */
-function checkAuth() {
-    if (!Auth.isAuthenticated()) {
-        document.getElementById('loginPage').style.display = 'flex';
-        document.getElementById('dashboardPage').style.display = 'none';
-    } else {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('dashboardPage').style.display = 'flex';
+// ============================================================
+// FUNCIÓN DE LOGIN
+// ============================================================
+
+async function loginDirect() {
+    const usuario = document.getElementById('usuario').value;
+    const contrasena = document.getElementById('contrasena').value;
+    const msg = document.getElementById('loginMessage');
+
+    console.log('Login directo llamado');
+
+    if (!usuario || !contrasena) {
+        msg.className = 'form-message error';
+        msg.textContent = '✗ Completa usuario y contraseña';
+        return;
+    }
+
+    try {
+        msg.className = 'form-message';
+        msg.textContent = 'Verificando credenciales...';
+
+        const result = await Auth.login(usuario, contrasena);
+
+        msg.className = 'form-message success';
+        msg.textContent = '✓ ¡Bienvenido!';
+
+        console.log('Login exitoso:', result);
+
+        setTimeout(() => {
+            document.getElementById('loginSection').classList.remove('active');
+            document.getElementById('dashboardSection').classList.add('active');
+            document.getElementById('usuario').value = '';
+            document.getElementById('contrasena').value = '';
+            msg.textContent = '';
+        }, 500);
+
+    } catch (error) {
+        console.error('Error de login:', error);
+        msg.className = 'form-message error';
+        msg.textContent = '✗ ' + error.message;
     }
 }
 
-/**
- * Inicializar autenticación al cargar la página
- */
-document.addEventListener('DOMContentLoaded', function() {
-    checkAuth();
+// ============================================================
+// MICROSERVICIOS - VERSIÓN SIMPLE
+// ============================================================
 
-    // Verificar token cada 5 minutos
-    setInterval(async function() {
-        if (Auth.isAuthenticated()) {
-            const isValid = await Auth.verifyToken();
-            if (!isValid) {
-                alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-                showLogin();
-            }
-        }
-    }, 300000); // 5 minutos
-});
+const API_URLS = {
+    MS_AUTH: 'http://localhost:8001',
+    MS_CONDUCTORES: 'http://localhost:8002',
+    MS_VEHICULOS: 'http://localhost:8003',
+    MS_RUTAS: 'http://localhost:8004',
+    MS_VIAJES: 'http://localhost:8005'
+};
 
-/**
- * Mostrar página de login
- */
-function showLogin() {
-    Auth.clearSession();
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('dashboardPage').style.display = 'none';
-}
+class ConductoresAPI {
+    static async getAll(filters = {}) {
+        const url = new URL(API_URLS.MS_CONDUCTORES + '/api/conductores');
+        if (filters.documento) url.searchParams.append('documento', filters.documento);
+        if (filters.estado) url.searchParams.append('estado', filters.estado);
 
-/**
- * Manejar envío del formulario de login
- */
-document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const usuario = document.getElementById('loginUser').value.trim();
-            const contrasena = document.getElementById('loginPassword').value.trim();
-            const errorDiv = document.getElementById('loginError');
-
-            // Limpiar mensaje de error
-            errorDiv.textContent = '';
-            errorDiv.classList.remove('show');
-
-            if (!usuario || !contrasena) {
-                errorDiv.textContent = 'Por favor completa todos los campos';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            try {
-                const result = await Auth.login(usuario, contrasena);
-
-                if (result.success) {
-                    // Login exitoso, mostrar dashboard
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('dashboardPage').style.display = 'flex';
-                    document.getElementById('loginForm').reset();
-                } else {
-                    errorDiv.textContent = result.message || 'Usuario o contraseña incorrectos';
-                    errorDiv.classList.add('show');
-                }
-            } catch (error) {
-                errorDiv.textContent = 'Error al iniciar sesión. Verifica que los servicios estén activos.';
-                errorDiv.classList.add('show');
-                console.error('Error de login:', error);
+        const response = await fetch(url.toString(), {
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
             }
         });
+        return response.json();
     }
-});
+
+    static async create(data) {
+        const response = await fetch(API_URLS.MS_CONDUCTORES + '/api/conductores', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async update(id, data) {
+        const response = await fetch(API_URLS.MS_CONDUCTORES + '/api/conductores/' + id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async delete(id) {
+        const response = await fetch(API_URLS.MS_CONDUCTORES + '/api/conductores/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        });
+        return response.json();
+    }
+}
+
+class VehiculosAPI {
+    static async getAll(filters = {}) {
+        const url = new URL(API_URLS.MS_VEHICULOS + '/api/vehiculos');
+        if (filters.placa) url.searchParams.append('placa', filters.placa);
+        if (filters.estado) url.searchParams.append('estado', filters.estado);
+
+        const response = await fetch(url.toString(), {
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        });
+        return response.json();
+    }
+
+    static async create(data) {
+        const response = await fetch(API_URLS.MS_VEHICULOS + '/api/vehiculos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async update(id, data) {
+        const response = await fetch(API_URLS.MS_VEHICULOS + '/api/vehiculos/' + id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async delete(id) {
+        const response = await fetch(API_URLS.MS_VEHICULOS + '/api/vehiculos/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        });
+        return response.json();
+    }
+}
+
+class RutasAPI {
+    static async getAll(filters = {}) {
+        const url = new URL(API_URLS.MS_RUTAS + '/api/rutas');
+        if (filters.origen) url.searchParams.append('origen', filters.origen);
+        if (filters.destino) url.searchParams.append('destino', filters.destino);
+
+        const response = await fetch(url.toString(), {
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        });
+        return response.json();
+    }
+
+    static async create(data) {
+        const response = await fetch(API_URLS.MS_RUTAS + '/api/rutas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async update(id, data) {
+        const response = await fetch(API_URLS.MS_RUTAS + '/api/rutas/' + id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async delete(id) {
+        const response = await fetch(API_URLS.MS_RUTAS + '/api/rutas/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        });
+        return response.json();
+    }
+}
+
+class ViajesAPI {
+    static async getAll(filters = {}) {
+        const url = new URL(API_URLS.MS_VIAJES + '/api/viajes');
+        if (filters.conductor_id) url.searchParams.append('conductor_id', filters.conductor_id);
+        if (filters.estado) url.searchParams.append('estado', filters.estado);
+
+        const response = await fetch(url.toString(), {
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        });
+        return response.json();
+    }
+
+    static async create(data) {
+        const response = await fetch(API_URLS.MS_VIAJES + '/api/viajes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async update(id, data) {
+        const response = await fetch(API_URLS.MS_VIAJES + '/api/viajes/' + id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Auth.getToken()}`
+            },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    }
+
+    static async delete(id) {
+        const response = await fetch(API_URLS.MS_VIAJES + '/api/viajes/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${Auth.getToken()}`
+            }
+        });
+        return response.json();
+    }
+}
