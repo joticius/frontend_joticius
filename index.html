@@ -22,7 +22,7 @@
             </div>
             <div class="login-right">
                 <h2>¡Bienvenido!</h2>
-                <form id="loginForm">
+                <form id="loginForm" onsubmit="event.preventDefault(); loginDirect();">
                     <div class="form-group">
                         <label>Usuario</label>
                         <input type="text" id="usuario" name="usuario" placeholder="Usuario" required>
